@@ -1,0 +1,496 @@
+zabbix_export:
+  version: '5.4'
+  date: '2024-03-12T08:56:39Z'
+  groups:
+    -
+      uuid: 7df96b18c230490a9a0a9e2307226338
+      name: Templates
+  templates:
+    -
+      uuid: dca5ffe57346475290a9544587711221
+      template: 'JM - App Plex Tautulli'
+      name: 'JM - App Plex Tautulli'
+      groups:
+        -
+          name: Templates
+      items:
+        -
+          uuid: 7d89130c418041b9b82cf89f918acf19
+          name: 'Plex: Port Performance'
+          key: 'net.tcp.service.perf[http,,32400]'
+          delay: 15m
+          history: 28d
+          value_type: FLOAT
+          units: sec
+          tags:
+            -
+              tag: Application
+              value: 'Tautulli - Plex'
+        -
+          uuid: 7c9472627a5646e5b9058a6150e08f16
+          name: 'Plex: Port Status'
+          key: 'net.tcp.service[http,,32400]'
+          delay: 15m
+          history: 28d
+          trends: '0'
+          value_type: LOG
+          tags:
+            -
+              tag: Application
+              value: 'Tautulli - Plex'
+          triggers:
+            -
+              uuid: 5efc051951a647d29b1f99caff4557d0
+              expression: 'last(/JM - App Plex Tautulli/net.tcp.service[http,,32400])=0'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'last(/JM - App Plex Tautulli/net.tcp.service[http,,32400])=1'
+              name: 'Plex: Service Down'
+              priority: AVERAGE
+              manual_close: 'YES'
+        -
+          uuid: 5ee8abd614c14b429127674008bd1914
+          name: 'Plex: Server Activity'
+          type: HTTP_AGENT
+          key: tautulli.get_activity
+          delay: 2m
+          history: 1d
+          trends: '0'
+          value_type: TEXT
+          url: 'http://{$PLEXIP}:{$PLEXPORT}/api/v2'
+          query_fields:
+            -
+              name: apikey
+              value: '{$APIKEY}'
+            -
+              name: cmd
+              value: get_activity
+          output_format: JSON
+          tags:
+            -
+              tag: Application
+              value: 'Tautulli - Plex'
+        -
+          uuid: 17301afe78de405f813addb068cbab2d
+          name: 'Plex: Bandwidth - LAN'
+          type: DEPENDENT
+          key: tautulli.get_activity.lan_bandwidth
+          delay: '0'
+          units: bytes
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.body.response.data.lan_bandwidth
+            -
+              type: STR_REPLACE
+              parameters:
+                - '["'
+                - ''
+            -
+              type: STR_REPLACE
+              parameters:
+                - '"]'
+                - ''
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1000'
+          master_item:
+            key: tautulli.get_activity
+          tags:
+            -
+              tag: Application
+              value: 'Tautulli - Plex'
+        -
+          uuid: bd5d4c71efc94fa1a8ded03f63c62efb
+          name: 'Plex: Streams - Total'
+          type: DEPENDENT
+          key: tautulli.get_activity.stream_count
+          delay: '0'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.body.response.data.stream_count
+            -
+              type: STR_REPLACE
+              parameters:
+                - '["'
+                - ''
+            -
+              type: STR_REPLACE
+              parameters:
+                - '"]'
+                - ''
+          master_item:
+            key: tautulli.get_activity
+          tags:
+            -
+              tag: Application
+              value: 'Tautulli - Plex'
+        -
+          uuid: e217d87a52a94dcab3081c14b4189eca
+          name: 'Plex: Streams - Direct Play'
+          type: DEPENDENT
+          key: tautulli.get_activity.stream_count_direct_play
+          delay: '0'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.body.response.data.stream_count_direct_play
+            -
+              type: STR_REPLACE
+              parameters:
+                - '["'
+                - ''
+            -
+              type: STR_REPLACE
+              parameters:
+                - '"]'
+                - ''
+          master_item:
+            key: tautulli.get_activity
+          tags:
+            -
+              tag: Application
+              value: 'Tautulli - Plex'
+        -
+          uuid: 444faa2c927d46dba165409a167ffefd
+          name: 'Plex: Streams - Direct Stream'
+          type: DEPENDENT
+          key: tautulli.get_activity.stream_count_direct_stream
+          delay: '0'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.body.response.data.stream_count_direct_stream
+            -
+              type: STR_REPLACE
+              parameters:
+                - '["'
+                - ''
+            -
+              type: STR_REPLACE
+              parameters:
+                - '"]'
+                - ''
+          master_item:
+            key: tautulli.get_activity
+          tags:
+            -
+              tag: Application
+              value: 'Tautulli - Plex'
+        -
+          uuid: f7c45c5f9a6342efb58211c39a8cd592
+          name: 'Plex: Streams - Transcoding'
+          type: DEPENDENT
+          key: tautulli.get_activity.stream_count_transcode
+          delay: '0'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.body.response.data.stream_count_transcode
+            -
+              type: STR_REPLACE
+              parameters:
+                - '["'
+                - ''
+            -
+              type: STR_REPLACE
+              parameters:
+                - '"]'
+                - ''
+          master_item:
+            key: tautulli.get_activity
+          tags:
+            -
+              tag: Application
+              value: 'Tautulli - Plex'
+        -
+          uuid: 535c74881c8842a8801026deabb1cece
+          name: 'Plex: Bandwidth - Total'
+          type: DEPENDENT
+          key: tautulli.get_activity.total_bandwidth
+          delay: '0'
+          units: bytes
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.body.response.data.total_bandwidth
+            -
+              type: STR_REPLACE
+              parameters:
+                - '["'
+                - ''
+            -
+              type: STR_REPLACE
+              parameters:
+                - '"]'
+                - ''
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1000'
+          master_item:
+            key: tautulli.get_activity
+          tags:
+            -
+              tag: Application
+              value: 'Tautulli - Plex'
+        -
+          uuid: ecca8ba1538f4d06a70b14713f9a197a
+          name: 'Plex: Bandwidth - WAN'
+          type: DEPENDENT
+          key: tautulli.get_activity.wan_bandwidth
+          delay: '0'
+          units: bytes
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.body.response.data.wan_bandwidth
+            -
+              type: STR_REPLACE
+              parameters:
+                - '["'
+                - ''
+            -
+              type: STR_REPLACE
+              parameters:
+                - '"]'
+                - ''
+            -
+              type: MULTIPLIER
+              parameters:
+                - '1000'
+          master_item:
+            key: tautulli.get_activity
+          tags:
+            -
+              tag: Application
+              value: 'Tautulli - Plex'
+        -
+          uuid: 7eac16e267554c8c8b793c9e0c870822
+          name: 'Plex: Update Availability'
+          type: HTTP_AGENT
+          key: tautulli.get_pms_update
+          delay: 1h
+          history: 1d
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.body.response.data.update_available
+            -
+              type: STR_REPLACE
+              parameters:
+                - 'false'
+                - 'False'
+            -
+              type: STR_REPLACE
+              parameters:
+                - 'true'
+                - 'True'
+          url: 'http://{$PLEXIP}:{$PLEXPORT}/api/v2'
+          query_fields:
+            -
+              name: apikey
+              value: '{$APIKEY}'
+            -
+              name: cmd
+              value: get_pms_update
+          output_format: JSON
+          tags:
+            -
+              tag: Application
+              value: 'Tautulli - Plex'
+          triggers:
+            -
+              uuid: 5863170a66aa4a30b53b536ca75d7447
+              expression: 'last(/JM - App Plex Tautulli/tautulli.get_pms_update)="True"'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'last(/JM - App Plex Tautulli/tautulli.get_pms_update)="False"'
+              name: 'Plex: Update available!'
+              priority: INFO
+              manual_close: 'YES'
+        -
+          uuid: 0e113b2c6a324c44a7018aa32c7e9d43
+          name: 'Plex: Server Info'
+          type: HTTP_AGENT
+          key: tautulli.get_servers_info
+          delay: 1h
+          history: 1d
+          trends: '0'
+          value_type: TEXT
+          url: 'http://{$PLEXIP}:{$PLEXPORT}/api/v2'
+          query_fields:
+            -
+              name: apikey
+              value: '{$APIKEY}'
+            -
+              name: cmd
+              value: get_servers_info
+          output_format: JSON
+          tags:
+            -
+              tag: Application
+              value: 'Tautulli - Plex'
+        -
+          uuid: a53ede09398d4c9cbb3967a8f253a2a6
+          name: 'Plex: Server Name'
+          type: DEPENDENT
+          key: tautulli.get_servers_info.name
+          delay: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.body.response.data..name
+            -
+              type: STR_REPLACE
+              parameters:
+                - '["'
+                - ''
+            -
+              type: STR_REPLACE
+              parameters:
+                - '"]'
+                - ''
+          master_item:
+            key: tautulli.get_servers_info
+          tags:
+            -
+              tag: Application
+              value: 'Tautulli - Plex'
+        -
+          uuid: f3bdf9427dfa41a4bf90eed046c0097b
+          name: 'Plex: Server Version'
+          type: DEPENDENT
+          key: tautulli.get_servers_info.version
+          delay: '0'
+          trends: '0'
+          value_type: TEXT
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.body.response.data..version
+            -
+              type: STR_REPLACE
+              parameters:
+                - '["'
+                - ''
+            -
+              type: STR_REPLACE
+              parameters:
+                - '"]'
+                - ''
+          master_item:
+            key: tautulli.get_servers_info
+          tags:
+            -
+              tag: Application
+              value: 'Tautulli - Plex'
+      tags:
+        -
+          tag: Application
+          value: Plex
+      macros:
+        -
+          macro: '{$APIKEY}'
+          type: SECRET_TEXT
+        -
+          macro: '{$PLEXIP}'
+          value: 10.10.10.10
+        -
+          macro: '{$PLEXPORT}'
+          value: '8181'
+      dashboards:
+        -
+          uuid: 7012a11d722d4f49b235a93a8b1a8144
+          name: 'Plex Data'
+          pages:
+            -
+              widgets:
+                -
+                  type: GRAPH_CLASSIC
+                  width: '24'
+                  height: '7'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Plex Streams'
+                        host: 'JM - App Plex Tautulli'
+                -
+                  type: GRAPH_CLASSIC
+                  'y': '7'
+                  width: '24'
+                  height: '7'
+                  fields:
+                    -
+                      type: GRAPH
+                      name: graphid
+                      value:
+                        name: 'Plex Bandwidth'
+                        host: 'JM - App Plex Tautulli'
+  graphs:
+    -
+      uuid: ad5e2948c1044e129446c1dc3a93c9d2
+      name: 'Plex Bandwidth'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 388E3C
+          item:
+            host: 'JM - App Plex Tautulli'
+            key: tautulli.get_activity.lan_bandwidth
+        -
+          sortorder: '1'
+          color: D32F2F
+          item:
+            host: 'JM - App Plex Tautulli'
+            key: tautulli.get_activity.total_bandwidth
+        -
+          sortorder: '2'
+          drawtype: GRADIENT_LINE
+          color: 1976D2
+          item:
+            host: 'JM - App Plex Tautulli'
+            key: tautulli.get_activity.wan_bandwidth
+    -
+      uuid: 532be080b02d49cface12b3a3caa2774
+      name: 'Plex Streams'
+      graph_items:
+        -
+          color: A54F10
+          item:
+            host: 'JM - App Plex Tautulli'
+            key: tautulli.get_activity.stream_count_direct_play
+        -
+          sortorder: '1'
+          color: FC6EA3
+          item:
+            host: 'JM - App Plex Tautulli'
+            key: tautulli.get_activity.stream_count_direct_stream
+        -
+          sortorder: '2'
+          color: 6C59DC
+          item:
+            host: 'JM - App Plex Tautulli'
+            key: tautulli.get_activity.stream_count
+        -
+          sortorder: '3'
+          color: AC8C14
+          item:
+            host: 'JM - App Plex Tautulli'
+            key: tautulli.get_activity.stream_count_transcode
